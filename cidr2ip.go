@@ -82,17 +82,6 @@ func displayIPs(cs string) {
 	}
 }
 
-// The next IP address of a given ip address
-// https://stackoverflow.com/a/33925954
-func increment(ip net.IP) {
-	for i := len(ip) - 1; i >= 0; i-- {
-		ip[i]++
-		if ip[i] != 0 {
-			break
-		}
-	}
-}
-
 func usage() {
 	fmt.Fprintf(os.Stderr, "CIDR to IPs version %s\n", Version)
 	fmt.Fprintf(os.Stderr, "Usage:   $ cidr2ip [-r] [-f <filename>] <list of cidrs> \n")
