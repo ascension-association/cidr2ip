@@ -8,6 +8,8 @@ import (
 	"net"
 	"os"
 	"regexp"
+
+	"github.com/adedayo/cidr"
 )
 
 const (
@@ -59,49 +61,24 @@ func main() {
 			cidrs = args
 		}
 
-		for _, cidr := range cidrs {
-			displayIPs(cidr)
+		for _, cs := range cidrs {
+			displayIPs(cs)
 		}
 	} else { // no piped input, no file provide and no args, display usage
 		flag.Usage()
 	}
 }
 
-func isIPAddr(cidr string) bool {
-	match, _ := regexp.MatchString(IPRegex, cidr)
+func isIPAddr(cs string) bool {
+	match, _ := regexp.MatchString(IPRegex, cs)
 	return match
 }
 
-func displayIPs(cidr string) {
-	var ips []string
+func displayIPs(cs string) {
+	ips := cidr.Expand(cs)
 
-	// if a IP address, display the IP address and return
-	if isIPAddr(cidr) {
-		fmt.Println(cidr)
-		return
-	}
-
-	ipAddr, ipNet, err := net.ParseCIDR(cidr)
-	if err != nil {
-		log.Print(err)
-		return
-	}
-
-	for ip := ipAddr.Mask(ipNet.Mask); ipNet.Contains(ip); increment(ip) {
-		ips = append(ips, ip.String())
-	}
-
-	// CIDR too small eg. /31
-	if len(ips) <= 2 {
-		return
-	}
-
-	if *printRangesPtrPtr == true {
-		fmt.Printf("%s-%s\n", ips[1], ips[len(ips)-2])
-	} else {
-		for _, ip := range ips[1 : len(ips)-1] {
-			fmt.Println(ip)
-		}
+	for _, ip := range ips {
+		println(ip)
 	}
 }
 
