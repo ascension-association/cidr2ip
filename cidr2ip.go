@@ -21,8 +21,6 @@ var (
 		"[Optional] Name of input file with CIDR blocks")
 	outputFilePtr = flag.String("o", "",
 		"[Optional] Name of output file for storing result")
-	printRangesPtrPtr = flag.Bool("r", false,
-		"[Optional] Print IP ranges instead of all IPs")
 	outputWriterPtr *bufio.Writer
 )
 
@@ -37,12 +35,12 @@ func main() {
 	args := os.Args[1:]
 
 	if *outputFilePtr != "" {
-		file, err := os.Create(*outputFilePtr)
+		f, err := os.Create(*outputFilePtr)
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			defer file.Close()
-			outputWriterPtr = bufio.NewWriter(file)
+			defer f.Close()
+			outputWriterPtr = bufio.NewWriter(f)
 		}
 	}
 
@@ -67,11 +65,7 @@ func main() {
 		}
 	} else if len(args) > 0 { // look for CIDRs on cmd line
 		var cidrs []string
-		if *printRangesPtrPtr == true {
-			cidrs = args[1:]
-		} else {
-			cidrs = args
-		}
+		cidrs = args
 
 		for _, cs := range cidrs {
 			displayIPs(cs)
@@ -104,11 +98,11 @@ func displayIPs(cs string) {
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "CIDR to IPs version %s\n", Version)
-	fmt.Fprintf(os.Stderr, "Usage:   $ cidr2ip [-r] [-f <filename>] <list of cidrs> \n")
-	fmt.Fprintf(os.Stderr, "Example: $ cidr2ip -f cidrs.txt\n")
-	fmt.Fprintf(os.Stderr, "         $ cidr2ip 10.0.0.0/24\n")
-	fmt.Fprintf(os.Stderr, "         $ cidr2ip -r 10.0.0.0/24\n")
-	fmt.Fprintf(os.Stderr, "         $ cidr2ip -r -f cidrs.txt\n")
+	fmt.Fprintf(os.Stderr, "Usage:   $ cidr2ip [-i <filename>] [-o <filename>] [<list of cidrs>] \n")
+	fmt.Fprintf(os.Stderr, "Example: $ cidr2ip 10.0.0.0/27\n")
+	fmt.Fprintf(os.Stderr, "         $ cidr2ip -i cidrs.txt\n")
+	fmt.Fprintf(os.Stderr, "         $ cidr2ip -o results.txt 10.0.0.0/27\n")
+	fmt.Fprintf(os.Stderr, "         $ cidr2ip -i cidrs.txt -o results.txt\n")
 	fmt.Fprintf(os.Stderr, "         $ cat cidrs.txt | cidr2ip \n")
 	fmt.Fprintf(os.Stderr, "--------------------------\nFlags:\n")
 	flag.PrintDefaults()

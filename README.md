@@ -7,32 +7,69 @@ This program converts IPv4 CIDR blocks into their constituent IP addresses.
 1. Commnd line arguments
 ```
 code@express:~$ cidr2ip 10.0.0.0/30 192.68.0.0/30
+10.0.0.0
 10.0.0.1
 10.0.0.2
+10.0.0.3
+192.68.0.0
 192.68.0.1
 192.68.0.2
-```
-
-The `-r` flag outputs IP ranges seperated by hyphen.
-
-```
-code@express:~$ cidr2ip -r 10.0.0.0/30 192.68.0.0/30
-10.0.0.1-10.0.0.2
-192.68.0.1-192.68.0.2
+192.68.0.3
 ```
 
 2. Piped input
 ```
 code@express:~$ cat cidrs.txt | cidr2ip
+127.0.0.1
+192.168.0.100
 192.168.0.101
 192.168.0.102
+192.168.0.103
+10.0.0.0
+10.0.0.1
+10.0.0.2
+10.0.0.3
+10.0.0.4
+10.0.0.5
+10.0.0.6
+10.0.0.7
 ```
 
 3. File input
 ```
-code@express:~$ cidr2ip -f cidrs.txt
+code@express:~$ cidr2ip -i cidrs.txt
+127.0.0.1
+192.168.0.100
 192.168.0.101
 192.168.0.102
+192.168.0.103
+10.0.0.0
+10.0.0.1
+10.0.0.2
+10.0.0.3
+10.0.0.4
+10.0.0.5
+10.0.0.6
+10.0.0.7
+```
+
+4. File output
+```
+code@express:~$ cidr2ip -i cidrs.txt -o results.txt
+code@express:~$ cat results.txt
+127.0.0.1
+192.168.0.100
+192.168.0.101
+192.168.0.102
+192.168.0.103
+10.0.0.0
+10.0.0.1
+10.0.0.2
+10.0.0.3
+10.0.0.4
+10.0.0.5
+10.0.0.6
+10.0.0.7
 ```
 
 ### Install
