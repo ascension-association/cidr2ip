@@ -12,15 +12,18 @@ import (
 )
 
 const (
-	Version = "2.0.0"
+	Version = "3.0.0"
 	IPRegex = `\b(?:\d{1,3}\.){3}\d{1,3}\b$`
 )
 
 var (
-	cidrFilePtr = flag.String("f", "",
-		"[Optional] Name of file with CIDR blocks")
+	cidrFilePtr = flag.String("i", "",
+		"[Optional] Name of input file with CIDR blocks")
+	outputFilePtr = flag.String("o", "",
+		"[Optional] Name of output file for storing result")
 	printRangesPtrPtr = flag.Bool("r", false,
 		"[Optional] Print IP ranges instead of all IPs")
+	outputWriterPtr *bufio.Writer
 )
 
 func main() {
@@ -32,6 +35,16 @@ func main() {
 		log.Fatal(err)
 	}
 	args := os.Args[1:]
+
+	if *outputFilePtr != "" {
+		file, err := os.Create(*outputFilePtr)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			defer file.Close()
+			outputWriterPtr = bufio.NewWriter(file)
+		}
+	}
 
 	if *cidrFilePtr != "" {
 		file, err := os.Open(*cidrFilePtr)
@@ -66,6 +79,10 @@ func main() {
 	} else { // no piped input, no file provide and no args, display usage
 		flag.Usage()
 	}
+
+	if outputWriterPtr != nil {
+		outputWriterPtr.Flush()
+	}
 }
 
 func isIPAddr(cs string) bool {
@@ -77,7 +94,11 @@ func displayIPs(cs string) {
 	ips := cidr.Expand(cs)
 
 	for _, ip := range ips {
-		println(ip)
+		if *outputFilePtr != "" {
+			outputWriterPtr.WriteString(ip + "\n")
+		} else {
+			println(ip)
+		}
 	}
 }
 
